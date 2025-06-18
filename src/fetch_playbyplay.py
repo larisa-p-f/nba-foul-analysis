@@ -29,7 +29,7 @@ def get_playbyplay(game_id):
         - PERIOD: Quarter (1 = Q1, 5 = OT1, etc.)
         - PCTIMESTRING: Time left in quarter
         - HOMEDESCRIPTION / VISITORDESCRIPTION: Text commentary
-        - SCORE / SCOREMARGIN: Current score and margin
+        - SCOREMARGIN: Current score margin
 
     Parameters:
         game_id (str): Game ID like '0021800854'
@@ -39,7 +39,11 @@ def get_playbyplay(game_id):
     """
     time.sleep(0.6)  # prevent triggering rate limiting
     df = playbyplayv2.PlayByPlayV2(game_id = game_id).get_data_frames()[0]
-    return df[['EVENTNUM', 'EVENTMSGTYPE', 'PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION', 'SCORE', 'SCOREMARGIN']]
+    df['SCOREMARGIN'] = df['SCOREMARGIN'].ffill()  # score margin are NaN except for when a basket is made, forward fill NaN values with latest score margin value
+    df['SCOREMARGIN'] = df['SCOREMARGIN'].replace(to_replace='TIE', value=0)  # replace TIE with 0
+    df['SCOREMARGIN'] = df['SCOREMARGIN'].fillna(0)  # replace NaN with 0
+    df['SCOREMARGIN'] = pd.to_numeric(df['SCOREMARGIN'])  # make the column numeric
+    return df[['EVENTNUM', 'EVENTMSGTYPE', 'PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION', 'SCOREMARGIN']]
 
 def is_foul(event):
     # eventmsgtype = 6 for fouls
