@@ -3,6 +3,10 @@ from nba_api.stats.endpoints import playbyplayv2
 from nba_api.stats.endpoints import leaguegamefinder
 import os
 import time
+import requests
+
+FAILED_LOG_PATH = "data/failed_games.txt"
+
 
 def get_games_for_season(season):
     """
@@ -19,9 +23,10 @@ def get_games_for_season(season):
     games_df = gamefinder.get_data_frames()[0]
     return list(games_df['GAME_ID'].drop_duplicates())
 
-def get_playbyplay(game_id):
+def get_playbyplay(game_id, max_retries=5, backoff=5):
     """
     Pull play-by-play data for a single game using its game ID.
+    Retry fetching the game if there was a timeout error.
 
     Includes:
         - EVENTNUM: Event index
@@ -37,13 +42,27 @@ def get_playbyplay(game_id):
     Returns:
         DataFrame: Subset of play-by-play data with key columns.
     """
-    time.sleep(0.6)  # prevent triggering rate limiting
-    df = playbyplayv2.PlayByPlayV2(game_id = game_id).get_data_frames()[0]
-    df['SCOREMARGIN'] = df['SCOREMARGIN'].ffill()  # score margin are NaN except for when a basket is made, forward fill NaN values with latest score margin value
-    df['SCOREMARGIN'] = df['SCOREMARGIN'].replace(to_replace='TIE', value=0)  # replace TIE with 0
-    df['SCOREMARGIN'] = df['SCOREMARGIN'].fillna(0)  # replace NaN with 0
-    df['SCOREMARGIN'] = pd.to_numeric(df['SCOREMARGIN'])  # make the column numeric
-    return df[['EVENTNUM', 'EVENTMSGTYPE', 'PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION', 'SCOREMARGIN']]
+    for attempt in range(max_retries):
+        try:
+            time.sleep(0.6)  # prevent triggering rate limiting
+            df = playbyplayv2.PlayByPlayV2(game_id = game_id).get_data_frames()[0]
+            df['SCOREMARGIN'] = df['SCOREMARGIN'].ffill()  # score margin are NaN except for when a basket is made, forward fill NaN values with latest score margin value
+            df['SCOREMARGIN'] = df['SCOREMARGIN'].replace(to_replace='TIE', value=0)  # replace TIE with 0
+            df['SCOREMARGIN'] = df['SCOREMARGIN'].fillna(0)  # replace NaN with 0
+            df['SCOREMARGIN'] = pd.to_numeric(df['SCOREMARGIN'])  # make the column numeric
+            return df[['EVENTNUM', 'EVENTMSGTYPE', 'PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION', 'SCOREMARGIN']]
+        
+        except requests.exceptions.ReadTimeout:
+            print(f"Timeout on game {game_id}, attempt {attempt + 1}/{max_retries}")
+            time.sleep(backoff * (attempt + 1))  # exponential backoff
+        except Exception as e:
+            print(f"Other error on game {game_id}: {e}")
+            return pd.DataFrame()  # return empty so concat doesn't fail
+
+    print(f"Failed to get play-by-play for game {game_id} after {max_retries} retries.")
+    with open(FAILED_LOG_PATH, "a") as f:
+        f.write(f"{game_id}\n")
+    return pd.DataFrame()  # return empty dataframe, avoids crashing the script
 
 def is_foul(event):
     # eventmsgtype = 6 for fouls
@@ -56,10 +75,16 @@ def main():
         foul_events = []
         game_ids = get_games_for_season(season)
         for game_id in game_ids:
-            pbp = get_playbyplay(game_id)
-            foul_event = pbp[pbp['EVENTMSGTYPE'] == 6].copy()
-            foul_event['GAME_ID'] = game_id
-            foul_events.append(foul_event)
+            try:
+                pbp = get_playbyplay(game_id)
+                if pbp.empty:
+                    continue  # if a game wasn't able to be fetched, skip it
+                foul_event = pbp[pbp['EVENTMSGTYPE'] == 6].copy()
+                foul_event['GAME_ID'] = game_id
+                foul_events.append(foul_event)
+            except Exception as e:
+                print(f"Skipping game {game_id} due to error: {e}")
+
 
         all_fouls_df = pd.concat(foul_events, ignore_index=True)  # join all dataframes in foul_events list together
         os.makedirs("data", exist_ok=True)
