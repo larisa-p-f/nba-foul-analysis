@@ -44,12 +44,13 @@ def get_playbyplay(game_id, max_retries=5, backoff=5):
     """
     for attempt in range(max_retries):
         try:
-            time.sleep(0.6)  # prevent triggering rate limiting
+            time.sleep(1.5)  # prevent triggering rate limiting
             df = playbyplayv2.PlayByPlayV2(game_id = game_id).get_data_frames()[0]
             df['SCOREMARGIN'] = df['SCOREMARGIN'].ffill()  # score margin are NaN except for when a basket is made, forward fill NaN values with latest score margin value
             df['SCOREMARGIN'] = df['SCOREMARGIN'].replace(to_replace='TIE', value=0)  # replace TIE with 0
             df['SCOREMARGIN'] = df['SCOREMARGIN'].fillna(0)  # replace NaN with 0
             df['SCOREMARGIN'] = pd.to_numeric(df['SCOREMARGIN'])  # make the column numeric
+            print(f"Successfully fetched play-by-play for game {game_id}.")
             return df[['EVENTNUM', 'EVENTMSGTYPE', 'PERIOD', 'PCTIMESTRING', 'HOMEDESCRIPTION', 'VISITORDESCRIPTION', 'SCOREMARGIN']]
         
         except requests.exceptions.ReadTimeout:
@@ -69,7 +70,7 @@ def is_foul(event):
     return event == 6  # returns True if event is 6
 
 def main():
-    seasons = ['2021-22', '2022-23', '2023-24', '2024-25']
+    seasons = ['2023-24']
     for season in seasons:
         print('Gathering data for the {} NBA season.'.format(season))
         foul_events = []
