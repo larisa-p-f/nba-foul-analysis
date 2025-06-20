@@ -5,9 +5,6 @@ import os
 import time
 import requests
 
-FAILED_LOG_PATH = "data/failed_games.txt"
-
-
 def get_games_for_season(season):
     """
     Fetch all regular season NBA game IDs for a given season.
@@ -23,7 +20,7 @@ def get_games_for_season(season):
     games_df = gamefinder.get_data_frames()[0]
     return list(games_df['GAME_ID'].drop_duplicates())
 
-def get_playbyplay(game_id, max_retries=5, backoff=5):
+def get_playbyplay(game_id, max_retries=5, backoff=5, FAILED_LOG_PATH = "data/failed_games.txt"):
     """
     Pull play-by-play data for a single game using its game ID.
     Retry fetching the game if there was a timeout error.
@@ -38,13 +35,16 @@ def get_playbyplay(game_id, max_retries=5, backoff=5):
 
     Parameters:
         game_id (str): Game ID like '0021800854'
+        max_retries (int): Number of times to try fetching the same Game.
+        backoff (int): Exponentially increases the wait between fetching a failed Game.
 
     Returns:
         DataFrame: Subset of play-by-play data with key columns.
     """
+
     for attempt in range(max_retries):
         try:
-            time.sleep(1.5)  # prevent triggering rate limiting
+            time.sleep(5)  # prevent triggering rate limiting
             df = playbyplayv2.PlayByPlayV2(game_id = game_id).get_data_frames()[0]
             df['SCOREMARGIN'] = df['SCOREMARGIN'].ffill()  # score margin are NaN except for when a basket is made, forward fill NaN values with latest score margin value
             df['SCOREMARGIN'] = df['SCOREMARGIN'].replace(to_replace='TIE', value=0)  # replace TIE with 0
@@ -70,7 +70,7 @@ def is_foul(event):
     return event == 6  # returns True if event is 6
 
 def main():
-    seasons = ['2023-24']
+    seasons = "2023-24"
     for season in seasons:
         print('Gathering data for the {} NBA season.'.format(season))
         foul_events = []
