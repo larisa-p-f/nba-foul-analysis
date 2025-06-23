@@ -70,28 +70,27 @@ def is_foul(event):
     return event == 6  # returns True if event is 6
 
 def main():
-    seasons = "2023-24"
-    for season in seasons:
-        print('Gathering data for the {} NBA season.'.format(season))
-        foul_events = []
-        game_ids = get_games_for_season(season)
-        for game_id in game_ids:
-            try:
-                pbp = get_playbyplay(game_id)
-                if pbp.empty:
-                    continue  # if a game wasn't able to be fetched, skip it
-                foul_event = pbp[pbp['EVENTMSGTYPE'] == 6].copy()
-                foul_event['GAME_ID'] = game_id
-                foul_events.append(foul_event)
-            except Exception as e:
-                print(f"Skipping game {game_id} due to error: {e}")
+    season = "2018-19"
+    print('Gathering data for the {} NBA season.'.format(season))
+    foul_events = []
+    game_ids = get_games_for_season(season)
+    for game_id in game_ids:
+        try:
+            pbp = get_playbyplay(game_id, FAILED_LOG_PATH = "data/failed_games_"+season+".txt")
+            if pbp.empty:
+                continue  # if a game wasn't able to be fetched, skip it
+            foul_event = pbp[pbp['EVENTMSGTYPE'] == 6].copy()
+            foul_event['GAME_ID'] = game_id
+            foul_events.append(foul_event)
+        except Exception as e:
+            print(f"Skipping game {game_id} due to error: {e}")
 
 
-        all_fouls_df = pd.concat(foul_events, ignore_index=True)  # join all dataframes in foul_events list together
-        os.makedirs("data", exist_ok=True)
-        out_path = f"data/foul_events_{season.replace('/', '-')}.csv"
-        all_fouls_df.to_csv(out_path, index=False)
-        print(f"Saved to {out_path}")
+    all_fouls_df = pd.concat(foul_events, ignore_index=True)  # join all dataframes in foul_events list together
+    os.makedirs("data", exist_ok=True)
+    out_path = f"data/foul_events_{season.replace('/', '-')}.csv"
+    all_fouls_df.to_csv(out_path, index=False)
+    print(f"Saved to {out_path}")
 
 if __name__ == '__main__':
     main()
