@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-season = "2024-25"
+season = "2018-19"
 data_path = "data/foul_events_"+season+".csv"
 foul_events = pd.read_csv(data_path)
 foul_events = foul_events.astype({'PCTIMESTRING':'string', 'HOMEDESCRIPTION':'string', 'VISITORDESCRIPTION':'string'})
