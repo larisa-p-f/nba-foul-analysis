@@ -6,7 +6,7 @@ import time
 import requests
 from fetch_playbyplay import get_playbyplay
 
-season = "2023-24"
+season = "2018-19"
 
 with open("data/failed_games_"+season+".txt", "r") as f:
     failed_games = [line.strip() for line in f.readlines() if line.strip()]
