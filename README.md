@@ -37,3 +37,9 @@ segment by:
     PERIOD: early vs late game
 
     Team role: home vs visitor
+
+Compare foul types in close vs non-close games
+
+Break down technical vs personal fouls by margin
+
+Look only at last 2 minutes and check how margin affects foul frequency
