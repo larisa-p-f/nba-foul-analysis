@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-season = "2018-19"
+season = "2024-25"
 data_path = "data/foul_events_"+season+".csv"
 foul_events = pd.read_csv(data_path)
 foul_events = foul_events.astype({'PCTIMESTRING':'string', 'HOMEDESCRIPTION':'string', 'VISITORDESCRIPTION':'string'})
@@ -27,14 +27,26 @@ def clean_foul(foul):
         'away.from.play.foul',
         'offensive charge foul',
         't.foul',
-        'personal take foul'
+        'personal take foul',
+        'transition take foul',
+        'hanging.tech.foul',
+        'non-unsportsmanlike tech foul - flopping',
+        'non-unsportsmanlike tech foul - bench',
+        'too many players tech foul',
+        'punch.foul',
+        'personal block foul',
+        'shooting block foul',
+        'in.foul'
     ]
     
     for known in known_fouls:
         if known in foul:
             return known
+    if 'no foul' in foul:
+        return None
     if 'foul' in foul:
-        return 'foul'  # if none of the fouls matched, but foul is present in the text, preserve it#
+        # print(foul)  # if none of the fouls matched, but foul is present in the text, print it so i can add to the list
+        return 'foul'  # if none of the fouls matched, but foul is present in the text, preserve it
         
 foul_events['HOMEDESCRIPTION'] = foul_events['HOMEDESCRIPTION'].apply(clean_foul)
 foul_events['VISITORDESCRIPTION'] = foul_events['VISITORDESCRIPTION'].apply(clean_foul)
