@@ -2,7 +2,6 @@
 
 This repository contains a work-in-progress mini-project analysing foul-calling behavior in the NBA using play-by-play data from multiple seasons. The project includes data processing, exploratory analysis, and deeper analysis.
 
----
 
 ## Project Status
 
@@ -10,7 +9,6 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 **Current Phase:** Exploratory Data Analysis (EDA)
 **Scope:** Multi-season analysis across all 30 NBA teams
 
----
 
 ## Key Research Questions
 
@@ -32,7 +30,6 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 - Compute fouls per minute in each period
 - How many of these fouls occurred in "close games" (score margin ≤ 5)?
 
----
 
 ## Planned Segmentations
 
@@ -42,7 +39,6 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 - Team role: Home team vs visitor team
 - Win status (planned): Does the losing team commit more fouls?
 
----
 
 ## Additional Exploratory Questions
 
@@ -51,7 +47,6 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 - Assess whether foul calls changed in the absence of crowd pressure (e.g., during the 2019–2020 NBA bubble)
   - Compare pre-bubble vs bubble period data
 
----
 
 ## Current Progress
 
@@ -60,7 +55,6 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 - Cleaned and structured data to include time, type, and sscore margin
 - Ongoing: EDA
 
----
 
 ## Next Steps
 
@@ -68,6 +62,5 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 - Visualise foul types by period, margin, and team
 - Evaluate significance of observed patterns
 
----
 
 This project is an independent mini-project aimed at exploring patterns in NBA foul data using real-world multi-season data.
