@@ -1,45 +1,73 @@
-# nba-whistle-swallowing
-Do NBA Referees Swallow Their Whistles in Crunch Time?
+# NBA Foul Analysis
 
-Are fewer fouls called in the final 2 minutes of a close game compared to the rest of the game?
-Are fewer shooting fouls called late in close games?
-Do different types of fouls (personal, offensive, technical) change in frequency near the end?
+This repository contains a work-in-progress mini-project analysing foul-calling behavior in the NBA using play-by-play data from multiple seasons. The project includes data processing, exploratory analysis, and deeper analysis.
 
-Another interesting question that could be answered with the data I collect to answer the above questions is: Assess whether foul calls changed in the absence of crowd pressure (during the 2019-2020 bubble championship -> could split data from the season pre-buble and post-bubble)
+---
 
-Does home team or visitor team commit less fould?
+## Project Status
 
-Compare foul rates:
+**Status:** In Progress  
+**Current Phase:** Exploratory Data Analysis (EDA)
+**Scope:** Multi-season analysis across all 30 NBA teams
 
-    Last 2 minutes of 4th quarter in close games (score margin ≤ 5).
+---
 
-    Rest of regulation time.
+## Key Research Questions
 
-Compute fouls per minute in both periods.
+### Core Questions:
+- Are fewer fouls called in the final 2 minutes of a close game (score margin ≤ 5) compared to the rest of the game?
+- Are fewer shooting fouls called late in close games?
+- Do different types of fouls (personal, offensive, technical) change in frequency near the end of the game?
+- Does the home team or visitor team commit fewer fouls?
 
-Begin exploration of overtime vs non-overtime game fouls.
+### Overtime Analysis:
+- What is the distribution of fouls in overtime periods?
+- How do foul rates in overtime compare to regular time?
+- How do foul frequencies and types differ in games that go to overtime vs those that do not?
 
-Distribution of fouls committed in overtime?
-foul rates in overtime vs regular time?
-Bar chart of FOUL_TYPE counts (e.g. personal, technical, offensive)
+### Foul Rates & Game Context:
+- Compare foul rates between:
+  - The last 2 minutes of the 4th quarter in close games
+  - The rest of regulation
+- Compute fouls per minute in each period
+- How many of these fouls occurred in "close games" (score margin ≤ 5)?
 
-Does the losing team commit more fouls?
-How do foul rates differ in the last 2 mins of Q4 vs the rest of the game?
+---
 
-How many of these were "close games" (SCOREMARGIN ≤ 5)?
+## Planned Segmentations
 
-segment by:
+- Game closeness: Close games (score margin ≤ 5) vs blowouts
+- Foul type: Personal vs offensive vs technical vs flagrant
+- Game phase: Early game vs late game
+- Team role: Home team vs visitor team
+- Win status (planned): Does the losing team commit more fouls?
 
-    Close games vs blowouts
+---
 
-    Foul type: e.g., flagrant vs personal
+## Additional Exploratory Questions
 
-    PERIOD: early vs late game
+- Compare technical vs personal foul rates by score margin
+- Check how score margin affects foul frequency in the last 2 minutes
+- Assess whether foul calls changed in the absence of crowd pressure (e.g., during the 2019–2020 NBA bubble)
+  - Compare pre-bubble vs bubble period data
 
-    Team role: home vs visitor
+---
 
-Compare foul types in close vs non-close games
+## Current Progress
 
-Break down technical vs personal fouls by margin
+- Data collected using `nba_api` (play-by-play and game metadata)
+- Extracted foul events across multiple seasons
+- Cleaned and structured data to include time, type, and sscore margin
+- Ongoing: EDA
 
-Look only at last 2 minutes and check how margin affects foul frequency
+---
+
+## Next Steps
+
+- Compare foul behavior between seasons (including bubble season)
+- Visualise foul types by period, margin, and team
+- Evaluate significance of observed patterns
+
+---
+
+This project is an independent mini-project aimed at exploring patterns in NBA foul data using real-world multi-season data.
