@@ -6,29 +6,34 @@ import time
 import requests
 from fetch_playbyplay import get_playbyplay
 
-season = "2018-19"
+season = "2024-25"
 
-with open("data/failed_games_"+season+".txt", "r") as f:
+with open("data/failed_games_regular_"+season+".txt", "r") as f:
     failed_games = [line.strip() for line in f.readlines() if line.strip()]
 
+print("Fetching failed regular season games...")
+play_by_play_data = []
 
-foul_events = []
-for game in failed_games:
+for game_id in failed_games:
     try:
-        pbp = get_playbyplay(game)
+        pbp = get_playbyplay(game_id, FAILED_LOG_PATH = "data/failed_games_regular_"+season+"_2.txt")
         if pbp.empty:
             continue  # if a game wasn't able to be fetched, skip it
-        foul_event = pbp[pbp['EVENTMSGTYPE'] == 6].copy()
-        foul_event['GAME_ID'] = game
-        foul_events.append(foul_event)
-    except Exception as e:
-        print(f"Skipping game {game} due to error: {e}")
 
-if foul_events:
-    all_fouls_df = pd.concat(foul_events, ignore_index=True)  # join all dataframes in foul_events list together
-    all_fouls_df.to_csv("data/foul_events_"+season+".csv", mode='a', index=False, header=False)
+        play_by_play_data.append(pbp)
+    
+    except Exception as e:
+        print(f"Skipping regular season game {game_id} due to error: {e}")
+
+if play_by_play_data:
+    all_play_df = pd.concat(play_by_play_data, ignore_index=True)  # join all dataframes
+    all_play_df.to_csv("data/playbyplay_regular_"+season+".csv", mode='a', index=False, header=False)
+
+    # extract fouls and append to foul file
+    reg_fouls_df = all_play_df[all_play_df['EVENTMSGTYPE'] == 6].copy()
+    reg_fouls_df.to_csv("data/foul_events_"+season+"_regular.csv", mode='a', index=False, header=False)
+
     print(f"Data added to fetched games")
 
 else:
     print("No new data fetched.")
-
