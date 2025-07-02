@@ -5,9 +5,9 @@ This repository contains a work-in-progress mini-project analysing foul-calling 
 
 ## Project Status
 
-**Status:** In Progress  
-**Current Phase:** Exploratory Data Analysis (EDA)
-**Scope:** Multi-season analysis across all 30 NBA teams
+- **Status:** In Progress  
+- **Current Phase:** Exploratory Data Analysis (EDA)
+- **Scope:** Multi-season analysis across all 30 NBA teams
 
 
 ## Key Research Questions
