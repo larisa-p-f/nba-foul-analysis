@@ -2,8 +2,10 @@ import pandas as pd
 import os
 
 season = "2024-25"
-data_path = "data/foul_events_"+season+".csv"
+season_type = "playoff"  # change depending on season type, either regular season or playoff
+data_path = "data/foul_events_"+season+"_"+season_type+".csv"
 foul_events = pd.read_csv(data_path)
+foul_events = foul_events[["GAME_ID", "PERIOD", "PCTIMESTRING", "HOMEDESCRIPTION", "VISITORDESCRIPTION", "SCOREMARGIN", "PLAYER1_ID", "PLAYER2_ID"]]
 foul_events = foul_events.astype({'PCTIMESTRING':'string', 'HOMEDESCRIPTION':'string', 'VISITORDESCRIPTION':'string'})
 foul_events['HOMEDESCRIPTION'] = foul_events['HOMEDESCRIPTION'].fillna('')
 foul_events['VISITORDESCRIPTION'] = foul_events['VISITORDESCRIPTION'].fillna('')
@@ -45,12 +47,11 @@ def clean_foul(foul):
     if 'no foul' in foul:
         return None
     if 'foul' in foul:
-        # print(foul)  # if none of the fouls matched, but foul is present in the text, print it so i can add to the list
+        print(foul)  # if none of the fouls matched, but foul is present in the text, print it so i can add to the list
         return 'foul'  # if none of the fouls matched, but foul is present in the text, preserve it
         
 foul_events['HOMEDESCRIPTION'] = foul_events['HOMEDESCRIPTION'].apply(clean_foul)
 foul_events['VISITORDESCRIPTION'] = foul_events['VISITORDESCRIPTION'].apply(clean_foul)
 
-out_path = f"data/clean_foul_events_{season}.csv"
-foul_events.to_csv(out_path, index=False)
-print(f"Saved to {out_path}")
+foul_events.to_csv(data_path, index=False)
+print(f"Saved to {data_path}")
